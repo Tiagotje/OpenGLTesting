@@ -56,7 +56,7 @@ int main()
 
 	Shader shader("shader.vs", "shader.fs"); // you can name your shader files however you like
 
-	Tex2D tex1("doge.jpg");
+	Tex2D tex1("awesomeface.png");
 
 	shader.use();
 	shader.setInt("texture1", tex1.getID());

@@ -8,7 +8,9 @@ class Tex2D
 public:
 	Tex2D(){}
 
-	Tex2D(std::string name);
+	Tex2D(std::string name, bool alpha);
+
+	Tex2D(std::string name) : Tex2D(name, false) {};
 
 	void use();
 
