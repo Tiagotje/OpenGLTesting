@@ -7,9 +7,16 @@
 
 unsigned int Cube::VAO = 0;
 unsigned int Cube::VBO = 0;
+bool Cube::ready = false;
+
+Cube::Cube()
+{
+	Cube::init();
+}
 
 Cube::Cube(glm::vec3 loc, glm::quat rot, Shader s, Tex2D t) : Shape(loc, rot, s) {
 	texture = t;
+	Cube::init();
 }
 
 void Cube::draw() {
@@ -20,6 +27,8 @@ void Cube::draw() {
 
 void Cube::init()
 {
+	if (Cube::ready) return;
+	Cube::ready = true;
 	float vertices[] = {
 		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 		0.5f, -0.5f, -0.5f,  1.0f, 0.0f,

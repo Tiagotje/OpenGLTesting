@@ -52,9 +52,8 @@ int main()
 
 	glEnable(GL_DEPTH_TEST);
 
-	Cube::init();
 
-	Shader shader("shader.vs", "shader.fs"); // you can name your shader files however you like
+	Shader shader("shader.vs", "shader.fs"); 
 
 	Tex2D tex1("awesomeface.png");
 
