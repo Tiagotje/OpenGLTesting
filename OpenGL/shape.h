@@ -23,5 +23,5 @@ public:
 	{};
 
 	void rotate(float angle, glm::vec3 direction);
-	virtual void draw() = 0;
+	virtual void draw(glm::mat4 proj, glm::mat4 view) = 0;
 };

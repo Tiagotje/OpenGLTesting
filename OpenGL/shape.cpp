@@ -14,7 +14,6 @@ Shape::Shape(glm::vec3 loc, glm::quat rot, Shader s)
 	location = loc;
 	model = glm::mat4(1.0f);
 	model = glm::translate(model, location);
-	model = model * glm::toMat4(rot);
 	shader = s;
 }
 

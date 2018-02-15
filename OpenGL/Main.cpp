@@ -7,6 +7,7 @@
 #include "texture.h"
 #include "shape.h"
 #include "cube.h"
+#include "camera.h"
 
 #include <iostream>
 
@@ -21,6 +22,9 @@ float xOffset = 0.0f;
 float yOffset = 0.0f;
 float speed = 0.008;
 
+glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
+glm::vec3 lightpos = glm::vec3(0.0f, 2.0f, -3.0f);
+
 
 int main()
 {
@@ -30,6 +34,7 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_SAMPLES, 4);
 
 														
 	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Wow Swag", NULL, NULL);
@@ -42,8 +47,6 @@ int main()
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-	// glad: load all OpenGL function pointers
-	// ---------------------------------------
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
 		std::cout << "Failed to initialize GLAD" << std::endl;
@@ -52,13 +55,19 @@ int main()
 
 	glEnable(GL_DEPTH_TEST);
 
-
 	Shader shader("shader.vs", "shader.fs"); 
+	Shader lampShader("lightcube.vs", "lightcube.fs");
 
-	Tex2D tex1("awesomeface.png");
+	Tex2D tex1("container.jpg", true);
 
 	shader.use();
 	shader.setInt("texture1", tex1.getID());
+	shader.setVec3("lightcolor", lightColor);
+	shader.setVec3("lightPos", lightpos);
+
+
+	lampShader.use();
+	lampShader.setVec3("lightcolor", lightColor);
 
 	glm::vec3 cubePositions[] = {
 		glm::vec3(0.0f,  0.0f,  0.0f),
@@ -75,52 +84,49 @@ int main()
 
 	Cube cubes[10];
 
+	Cube lamp = Cube(lightpos, glm::quat(), lampShader, Tex2D());
+
 	for (int i = 0; i < 10; i++) {
 		glm::quat rot = glm::angleAxis(glm::radians(20.0f*i), glm::vec3(1.0f, 0.3f, 0.5f));
 		cubes[i] = Cube(cubePositions[i], rot, shader, tex1);
 	}
 
-	//handle Textures
 
 	double lastTime = glfwGetTime();
 	int frameCount = 0;
+	glfwSwapInterval(0);
+	int FPS = 4000;
 
-	glfwSwapInterval(1);
-	int FPS = 60;
+	Camera cam1 = Camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -3.0f));
 
-	glm::mat4 proj(1.0f), view(1.0f), model(1.0f);
-
-
-
+	glEnable(GL_MULTISAMPLE);
 
 	// render loop
 	while (!glfwWindowShouldClose(window)){
 		processInput(window);
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // also clear the depth buffer now!
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);// also clear the depth buffer now!
 
-		tex1.use();
-		shader.use();
 
-		// create transformations
-		glm::mat4 view(1.0f);
+		//create projection
 		glm::mat4 projection(1.0f);
 		projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-		// pass transformation matrices to the shader
-		shader.setMat4("projection", projection); // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.
-		view = glm::translate(view, glm::vec3(0.0f, 0.0f, (float)sin(glfwGetTime())));
-		view = glm::rotate(view, (float)glfwGetTime()/3.0f, glm::vec3(0.0f, 0.0f, 1.0f));
-		shader.setMat4("view", view);
 
-
+		float camX = sin(glfwGetTime()/5.0f) * 10.0f;	
+		float camZ = cos(glfwGetTime()/5.0f) * 10.0f - 3.0f;
+		cam1.moveTo(glm::vec3(camX, 0.0f, camZ));
 		
+		shader.use();
+		shader.setVec3("lightpos", lightpos);
+
 		for (unsigned int i = 0; i < 10; i++)
 		{
-			//cubes[i].rotate(glfwGetTime(), glm::vec3(1.0f, 0.3f, 0.5f));
-			cubes[i].draw();
+			cubes[i].rotate(0.02f*(i+1)/FPS , glm::vec3(1.0f, 0.3f, 0.5f));
+			cubes[i].draw(projection, cam1.view());
 		}
+
+		lamp.draw(projection, cam1.view());
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
