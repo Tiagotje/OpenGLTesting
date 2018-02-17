@@ -15,6 +15,22 @@ Shape::Shape(glm::vec3 loc, glm::quat rot, Shader s)
 	model = glm::mat4(1.0f);
 	model = glm::translate(model, location);
 	shader = s;
+	color = glm::vec3(1.0f, 1.0f, 1.0f);
+	textured = false;
+}
+
+Shape::Shape(glm::vec3 loc, glm::quat rot, Shader s, Tex2D tex) :
+	Shape(loc, rot, s)
+{
+	textured = true;
+	texture = tex;
+}
+
+Shape::Shape(glm::vec3 loc, glm::quat rot, Shader s, glm::vec3 col) :
+	Shape(loc, rot, s)
+{
+	color = col;
+	textured = false;
 }
 
 void Shape::rotate(float angle, glm::vec3 direction)

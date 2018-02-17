@@ -15,15 +15,14 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 
 // settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+unsigned int SCR_WIDTH = 800;
+unsigned int SCR_HEIGHT = 600;
 
-float xOffset = 0.0f;
-float yOffset = 0.0f;
-float speed = 0.008;
+float FOV = 45.0F;
+int FPS = 4000;
+float camHeight = 0;
 
-glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
-glm::vec3 lightpos = glm::vec3(0.0f, 2.0f, -3.0f);
+glm::vec3 lightColor = glm::vec3(0.9f, 0.95f, 0.95f);
 
 
 int main()
@@ -56,24 +55,19 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 
 	Shader shader("shader.vs", "shader.fs"); 
-	Shader lampShader("lightcube.vs", "lightcube.fs");
 
 	Tex2D tex1("container.jpg", true);
 
 	shader.use();
 	shader.setInt("texture1", tex1.getID());
 	shader.setVec3("lightcolor", lightColor);
-	shader.setVec3("lightPos", lightpos);
 
-
-	lampShader.use();
-	lampShader.setVec3("lightcolor", lightColor);
 
 	glm::vec3 cubePositions[] = {
 		glm::vec3(0.0f,  0.0f,  0.0f),
-		glm::vec3(2.0f,  5.0f, -15.0f),
+		glm::vec3(2.0f,  6.0f, -8.0f),
 		glm::vec3(-1.5f, -2.2f, -2.5f),
-		glm::vec3(-3.8f, -2.0f, -12.3f),
+		glm::vec3(-3.8f, -2.0f, -8.3f),
 		glm::vec3(2.4f, -0.4f, -3.5f),
 		glm::vec3(-1.7f,  3.0f, -7.5f),
 		glm::vec3(1.3f, -2.0f, -2.5f),
@@ -84,8 +78,6 @@ int main()
 
 	Cube cubes[10];
 
-	Cube lamp = Cube(lightpos, glm::quat(), lampShader, Tex2D());
-
 	for (int i = 0; i < 10; i++) {
 		glm::quat rot = glm::angleAxis(glm::radians(20.0f*i), glm::vec3(1.0f, 0.3f, 0.5f));
 		cubes[i] = Cube(cubePositions[i], rot, shader, tex1);
@@ -95,9 +87,8 @@ int main()
 	double lastTime = glfwGetTime();
 	int frameCount = 0;
 	glfwSwapInterval(0);
-	int FPS = 4000;
 
-	Camera cam1 = Camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -3.0f));
+	Camera cam1 = Camera();
 
 	glEnable(GL_MULTISAMPLE);
 
@@ -111,22 +102,20 @@ int main()
 
 		//create projection
 		glm::mat4 projection(1.0f);
-		projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+		projection = glm::perspective(glm::radians(FOV), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
 		float camX = sin(glfwGetTime()/5.0f) * 10.0f;	
-		float camZ = cos(glfwGetTime()/5.0f) * 10.0f - 3.0f;
-		cam1.moveTo(glm::vec3(camX, 0.0f, camZ));
+		float camZ = cos(glfwGetTime()/5.0f) * 10.0f - 0.0f;
+		cam1.moveTo(glm::vec3(camX, camHeight, camZ));
 		
 		shader.use();
-		shader.setVec3("lightpos", lightpos);
 
 		for (unsigned int i = 0; i < 10; i++)
 		{
-			cubes[i].rotate(0.02f*(i+1)/FPS , glm::vec3(1.0f, 0.3f, 0.5f));
+			cubes[i].rotate(0.02f*(i+1)/FPS , glm::vec3(1.0f, 0.0f, 0.5f));
 			cubes[i].draw(projection, cam1.view());
 		}
 
-		lamp.draw(projection, cam1.view());
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -134,7 +123,6 @@ int main()
 		if (glfwGetTime() - lastTime >= 1.0) {
 			std::cout << "FPS: " << frameCount << std::endl;
 			FPS = frameCount;
-			speed = 1.0f / FPS;
 			lastTime = glfwGetTime();
 			frameCount = 0;
 		}
@@ -153,16 +141,18 @@ void processInput(GLFWwindow *window)
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-		yOffset -= speed;
+		FOV += (10.0f/FPS);
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-		yOffset += speed;
-	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-		xOffset -= speed;
-	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-		xOffset += speed;
+		FOV -= (10.0f/FPS);
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		camHeight += (5.0f / FPS);
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		camHeight -= (5.0f / FPS);
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
+	SCR_WIDTH = width;
+	SCR_HEIGHT = height;
 }

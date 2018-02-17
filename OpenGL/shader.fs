@@ -9,13 +9,24 @@ in vec3 FragPos;
 // texture samplers
 uniform sampler2D texture0;
 uniform vec3 lightcolor;
-uniform vec3 lightPos;
+uniform vec3 objectcolor;
+uniform bool textured;
+uniform vec3 viewPos;
 
 void main()
 {
 	vec3 norm = normalize(Normal);
-	vec3 lightDir = normalize(lightPos-FragPos);
+	vec3 lightDir = vec3(0.0f, 1.0f, 0.0f);
 	float diff = max(dot(norm, lightDir), 0.0);
-	vec3 diffuse = diff * lightcolor;
-	FragColor = vec4(0.4 * lightcolor + diffuse, 1.0) * texture(texture0, TexCoord);
+	float side = 1 - abs(dot(norm, vec3(0.0f, -1.0f, 0.0f)));
+	vec3 diffuse = (0.6 * diff+0.6*side) * lightcolor;
+	vec3 ambient =  0.3 * lightcolor;
+
+	vec4 tex;
+	if(textured)
+		tex = texture(texture0, TexCoord);
+	else 
+		tex = vec4(objectcolor, 1.0f);
+	
+	FragColor = vec4(ambient + diffuse, 1.0f) * tex;
 }

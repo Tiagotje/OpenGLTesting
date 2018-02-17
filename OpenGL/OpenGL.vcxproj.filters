@@ -33,6 +33,9 @@
     <ClCompile Include="camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="quad.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="shader.h">
@@ -53,18 +56,15 @@
     <ClInclude Include="camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="quad.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shader.vs">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="shader.fs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="lightcube.fs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="lightcube.vs">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

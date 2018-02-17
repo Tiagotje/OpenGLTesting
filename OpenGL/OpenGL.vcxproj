@@ -126,20 +126,20 @@
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="cube.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="quad.cpp" />
     <ClCompile Include="shape.cpp" />
     <ClCompile Include="texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.h" />
     <ClInclude Include="cube.h" />
+    <ClInclude Include="quad.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="shape.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="texture.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="lightcube.fs" />
-    <None Include="lightcube.vs" />
     <None Include="shader.fs" />
     <None Include="shader.vs" />
   </ItemGroup>
