@@ -61,3 +61,6 @@
 #*.PDF   diff=astextplain
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
+
+OpenGL/glm/* linguist-vendored
+OpenGL/stb_image.h linguist-vendored
