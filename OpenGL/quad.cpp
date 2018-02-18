@@ -52,3 +52,17 @@ void Quad::init()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 }
+
+void Quad::draw(glm::mat4 proj, glm::mat4 view)
+{
+	if (textured)
+		texture.use();
+	shader.use();
+	shader.setMat4("projection", proj);
+	shader.setMat4("view", view);
+	shader.setMat4("model", model);
+	shader.setBool("textured", textured);
+	shader.setVec3("objectcolor", color);
+	glBindVertexArray(VAO);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+}

@@ -37,3 +37,8 @@ void Shape::rotate(float angle, glm::vec3 direction)
 {
 	model = glm::rotate(model, angle, direction);
 }
+
+void Shape::scale(glm::vec3 f)
+{
+	model = glm::scale(model, f);
+}

@@ -7,6 +7,7 @@
 #include "texture.h"
 #include "shape.h"
 #include "cube.h"
+#include "quad.h"
 #include "camera.h"
 
 #include <iostream>
@@ -20,7 +21,7 @@ unsigned int SCR_HEIGHT = 600;
 
 float FOV = 45.0F;
 int FPS = 4000;
-float camHeight = 0;
+float camHeight = 3;
 
 glm::vec3 lightColor = glm::vec3(0.9f, 0.95f, 0.95f);
 
@@ -66,21 +67,20 @@ int main()
 	glm::vec3 cubePositions[] = {
 		glm::vec3(0.0f,  0.0f,  0.0f),
 		glm::vec3(2.0f,  6.0f, -8.0f),
-		glm::vec3(-1.5f, -2.2f, -2.5f),
-		glm::vec3(-3.8f, -2.0f, -8.3f),
-		glm::vec3(2.4f, -0.4f, -3.5f),
+		glm::vec3(-1.5f, 0.5f, -2.5f),
+		glm::vec3(-3.8f, 0.5f, -8.3f),
+		glm::vec3(2.4f,  0.5f, -3.5f),
 		glm::vec3(-1.7f,  3.0f, -7.5f),
-		glm::vec3(1.3f, -2.0f, -2.5f),
+		glm::vec3(1.3f,  0.5f, -2.5f),
 		glm::vec3(1.5f,  2.0f, -2.5f),
-		glm::vec3(1.5f,  0.2f, -1.5f),
+		glm::vec3(1.5f,  0.5f, -1.5f),
 		glm::vec3(-1.3f,  1.0f, -1.5f)
 	};
 
 	Cube cubes[10];
 
 	for (int i = 0; i < 10; i++) {
-		glm::quat rot = glm::angleAxis(glm::radians(20.0f*i), glm::vec3(1.0f, 0.3f, 0.5f));
-		cubes[i] = Cube(cubePositions[i], rot, shader, tex1);
+		cubes[i] = Cube(cubePositions[i], glm::quat(), shader, tex1);
 	}
 
 
@@ -91,6 +91,9 @@ int main()
 	Camera cam1 = Camera();
 
 	glEnable(GL_MULTISAMPLE);
+
+	Quad quad1 = Quad(glm::vec3(0.0f, 0.0f, 0.0f), glm::quat(), shader, glm::vec3(0.9f, 0.9f, 0.9f));
+	quad1.scale(glm::vec3(1000.0f, 1.0f, 1000.0f));
 
 	// render loop
 	while (!glfwWindowShouldClose(window)){
@@ -112,10 +115,10 @@ int main()
 
 		for (unsigned int i = 0; i < 10; i++)
 		{
-			cubes[i].rotate(0.02f*(i+1)/FPS , glm::vec3(1.0f, 0.0f, 0.5f));
 			cubes[i].draw(projection, cam1.view());
 		}
 
+		quad1.draw(projection, cam1.view());
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

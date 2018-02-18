@@ -21,16 +21,17 @@ Cube::Cube(glm::vec3 loc, glm::quat rot, Shader s, glm::vec3 c) : Shape(loc, rot
 	Cube::init();
 }
 
-void Cube::draw(glm::mat4 proj, glm::mat4 view) {
+void Cube::draw(glm::mat4 proj, glm::mat4 view)
+{
 	if(textured)
 		texture.use();
 	shader.use();
 	shader.setMat4("projection", proj);
 	shader.setMat4("view", view);
+	shader.setMat4("model", model);
 	shader.setBool("textured", textured);
 	shader.setVec3("objectcolor", color);
 	glBindVertexArray(VAO);
-	glUniformMatrix4fv(shader.getLocation("model"), 1, GL_FALSE, glm::value_ptr(model));
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
